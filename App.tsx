@@ -1,5 +1,5 @@
 import React, {useEffect} from 'react';
-import {SafeAreaView, Button} from 'react-native';
+import {SafeAreaView, Button, Platform} from 'react-native';
 import messaging from '@react-native-firebase/messaging';
 import notifee, {AndroidImportance} from '@notifee/react-native';
 
@@ -31,6 +31,19 @@ const displayNotification = async () => {
   });
 };
 
+const displayNotificationIOS = async () => {
+  await notifee.displayNotification({
+    title: 'Your account requires attention',
+    body: 'You are overdue payment on one or more of your accounts!',
+    ios: {
+      foregroundPresentationOptions: {
+        alert: true,
+        badge: true,
+        sound: true,
+      },
+    },
+  });
+};
 messaging().setBackgroundMessageHandler(async remoteMessage => {
   console.log('Message handled in the background!', remoteMessage);
 
@@ -52,9 +65,24 @@ const App = () => {
     await messaging().registerDeviceForRemoteMessages();
 
     const fcmToken = await messaging().getToken();
-    if (fcmToken) {
-      console.log(fcmToken);
+    if (!messaging().isDeviceRegisteredForRemoteMessages) {
+      messaging()
+        .registerDeviceForRemoteMessages()
+        .then(() => {
+          messaging()
+            .getAPNSToken()
+            .then(token => {
+              console.log('APN', token);
+            });
+        });
+    } else {
+      messaging()
+        .getAPNSToken()
+        .then(token => {
+          console.log('APN', token);
+        });
     }
+    console.log('FCM', fcmToken);
   };
   useEffect(() => {
     checkToken();
@@ -88,7 +116,16 @@ const App = () => {
 
   return (
     <SafeAreaView>
-      <Button title="HELLO" onPress={async () => {}} />
+      <Button
+        title="HELLO"
+        onPress={async () => {
+          if (Platform.OS === 'android') {
+            displayNotification();
+          } else {
+            displayNotificationIOS();
+          }
+        }}
+      />
     </SafeAreaView>
   );
 };
