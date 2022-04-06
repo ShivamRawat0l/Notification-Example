@@ -1,7 +1,8 @@
-import React, {useEffect} from 'react';
-import {SafeAreaView, Button, Platform} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {SafeAreaView, Button, Platform, Alert, TextInput} from 'react-native';
 import messaging from '@react-native-firebase/messaging';
 import notifee, {AndroidImportance} from '@notifee/react-native';
+import {AuthorizationStatus} from '@notifee/react-native';
 
 const displayNotification = async () => {
   const channelId = await notifee.createChannel({
@@ -44,15 +45,18 @@ const displayNotificationIOS = async () => {
     },
   });
 };
-messaging().setBackgroundMessageHandler(async remoteMessage => {
-  console.log('Message handled in the background!', remoteMessage);
-
-  displayNotification();
-});
 
 const App = () => {
+  const [value, setValue] = useState('new');
   async function requestUserPermission() {
     const authStatus = await messaging().requestPermission();
+    const settings = await notifee.requestPermission();
+
+    if (settings.authorizationStatus >= AuthorizationStatus.AUTHORIZED) {
+      console.log('Permission settings:', settings);
+    } else {
+      console.log('User declined permissions');
+    }
     const enabled =
       authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
       authStatus === messaging.AuthorizationStatus.PROVISIONAL;
@@ -65,24 +69,9 @@ const App = () => {
     await messaging().registerDeviceForRemoteMessages();
 
     const fcmToken = await messaging().getToken();
-    if (!messaging().isDeviceRegisteredForRemoteMessages) {
-      messaging()
-        .registerDeviceForRemoteMessages()
-        .then(() => {
-          messaging()
-            .getAPNSToken()
-            .then(token => {
-              console.log('APN', token);
-            });
-        });
-    } else {
-      messaging()
-        .getAPNSToken()
-        .then(token => {
-          console.log('APN', token);
-        });
-    }
     console.log('FCM', fcmToken);
+    setValue(fcmToken);
+    Alert.alert(fcmToken);
   };
   useEffect(() => {
     checkToken();
@@ -126,6 +115,7 @@ const App = () => {
           }
         }}
       />
+      <TextInput value={value} />
     </SafeAreaView>
   );
 };
