@@ -36,26 +36,10 @@ const displayNotification = async () => {
   });
 };
 
-const displayNotificationIOS = async () => {
-  await notifee.displayNotification({
-    title: 'Your account requires attention',
-    body: 'You are overdue payment on one or more of your accounts!',
-    ios: {
-      foregroundPresentationOptions: {
-        alert: true,
-        badge: true,
-        sound: true,
-      },
-    },
-  });
-};
-
 messaging().setBackgroundMessageHandler(async remoteMessage => {
   console.log('Message handled in the background!', remoteMessage);
   if (Platform.OS === 'android') {
     displayNotification();
-  } else {
-    displayNotificationIOS();
   }
 });
 

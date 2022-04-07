@@ -22,6 +22,7 @@ const displayNotification = async () => {
     id: 'important',
     name: 'Important Notifications',
     importance: AndroidImportance.HIGH,
+    badge: true,
   });
   notifee.displayNotification({
     title:
