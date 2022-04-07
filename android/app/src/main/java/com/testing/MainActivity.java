@@ -2,6 +2,8 @@ package com.cheatcode.testing;
 
 import com.facebook.react.ReactActivity;
 
+import io.invertase.notifee.NotifeeApiModule;
+
 public class MainActivity extends ReactActivity {
 
   /**
@@ -10,6 +12,7 @@ public class MainActivity extends ReactActivity {
    */
   @Override
   protected String getMainComponentName() {
-    return "testing";
+    return NotifeeApiModule.getMainComponent("testing");
+    //return "testing";
   }
 }
