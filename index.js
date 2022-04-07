@@ -63,25 +63,6 @@ const displayNotification = async () => {
           pressAction: {id: 'cry', mainComponent: 'custom-component'},
         },
       ],
-    },
-  });
-};
-
-const fullNotification = async () => {
-  const channelId = await notifee.createChannel({
-    id: 'important1',
-    name: 'Important Notifications2',
-    importance: AndroidImportance.HIGH,
-    badge: true,
-  });
-  notifee.displayNotification({
-    body: 'Full-screen notification',
-    android: {
-      channelId,
-      // Recommended to set a category
-      category: AndroidCategory.SOCIAL,
-      // Recommended to set importance to high
-      importance: AndroidImportance.HIGH,
       fullScreenAction: {
         id: 'default',
         mainComponent: 'custom-component',
@@ -89,10 +70,11 @@ const fullNotification = async () => {
     },
   });
 };
+
 messaging().setBackgroundMessageHandler(async remoteMessage => {
   console.log('Message handled in the background!', remoteMessage);
   if (Platform.OS === 'android') {
-    fullNotification();
+    displayNotification();
   }
 });
 
