@@ -72,3 +72,5 @@ buck-out/
 web-build/
 ./env.js
 env.js
+android/app/google-services.json
+FirebaseNotifications/serviceAccountKey.json
